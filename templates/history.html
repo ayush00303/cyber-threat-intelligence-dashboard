@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Scan History</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Scan History</h2>
+        <div style="text-align:center; margin:15px;">
+    <a href="/export" style="
+        background:#00C851;
+        padding:8px 15px;
+        color:white;
+        text-decoration:none;
+        border-radius:6px;">
+        Download CSV Report
+    </a>
+</div>
+
+     <table border="1" style="margin:auto; color:white; padding:10px;">
+            <tr>
+                <th>ID</th>
+                <th>IP</th>
+                <th>Country</th>
+                <th>Risk Score</th>
+                <th>Date</th>
+            </tr>
+
+            {% for scan in scans %}
+            <tr>
+                <td>{{ scan[0] }}</td>
+                <td>{{ scan[1] }}</td>
+                <td>{{ scan[2] }}</td>
+                <td>{{ scan[3] }}</td>
+                <td>{{ scan[4] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <br>
+        <a href="/">Back to Dashboard</a>
+    </div>
+    <footer style="
+    text-align:center;
+    margin-top:40px;
+    padding:15px;
+    font-size:14px;
+    color:#888;">
+    Made by  <strong>Ayush & Tejas </strong>
+</footer>
+</body>
+</html>

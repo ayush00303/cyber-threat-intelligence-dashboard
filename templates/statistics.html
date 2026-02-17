@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Threat Statistics</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Threat Intelligence Statistics</h1>
+
+    <p><strong>Total Scans:</strong> {{ total }}</p>
+    <p><strong>High Risk:</strong> {{ high }}</p>
+    <p><strong>Low Risk:</strong> {{ low }}</p>
+
+    <div style="width:300px; margin:20px auto;">
+    <canvas id="statsChart"></canvas>
+</div>
+
+
+    <br>
+    <a href="/">Back to Home</a>
+</div>
+
+<script>
+const ctx = document.getElementById('statsChart').getContext('2d');
+new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: ['High Risk', 'Low Risk'],
+        datasets: [{
+            data: [{{ high }}, {{ low }}],
+            backgroundColor: ['#ff4444', '#00C851']
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: true
+    }
+});
+
+</script>
+<footer style="
+    text-align:center;
+    margin-top:40px;
+    padding:15px;
+    font-size:14px;
+    color:#888;">
+    Made by  <strong>Ayush & Tejas </strong>
+</footer>
+</body>
+</html>

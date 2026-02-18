@@ -115,6 +115,39 @@ def history():
     conn.close()
     return render_template("history.html", scans=data)
 
+
+#Add professional API route
+
+@app.route("/api/scan/<ip>")
+def api_scan(ip):
+    try:
+        ip_obj = ipaddress.ip_address(ip)
+
+        if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_reserved:
+            return {
+                "ip": ip,
+                "country": "Private / Reserved IP",
+                "risk_score": 0
+            }
+
+        response = requests.get(f"http://ip-api.com/json/{ip}")
+        data = response.json()
+
+        country = data.get("country", "Unknown")
+        risk_score = calculate_risk(country)
+
+        return {
+            "ip": ip,
+            "country": country,
+            "risk_score": risk_score
+        }
+
+    except:
+        return {
+            "error": "Invalid IP address"
+        }
+
+
 @app.route("/export")
 def export_csv():
     conn = sqlite3.connect("database.db")

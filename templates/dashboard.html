@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Cyber Threat Dashboard</title>
+
+<link rel="stylesheet" href="/static/dashboard.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+background:#020617;
+color:white;
+margin:0;
+font-family:Arial;
+}
+
+/* MATRIX BACKGROUND */
+
+#matrix{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:-1;
+pointer-events:none;
+}
+
+.navbar{
+background:#020617;
+padding:15px 30px;
+padding-left:260px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+color:white;
+border-bottom:1px solid #1e293b;
+}
+
+.navbar a{
+color:#38bdf8;
+text-decoration:none;
+margin-left:20px;
+font-size:15px;
+}
+
+.navbar a:hover{
+color:white;
+}
+
+.main{
+margin-left:260px;
+padding:40px;
+width:calc(100% - 260px);
+box-sizing:border-box;
+}
+
+.card{
+background:#1e293b;
+padding:25px;
+border-radius:10px;
+display:inline-block;
+width:250px;
+margin-right:20px;
+text-align:center;
+}
+
+.chartbox{
+background:#1e293b;
+padding:25px;
+border-radius:10px;
+width:600px;
+margin-top:30px;
+}
+
+.action-buttons{
+margin-top:25px;
+}
+
+.action-buttons button{
+padding:10px 18px;
+margin:5px;
+border:none;
+background:#22c55e;
+color:white;
+cursor:pointer;
+border-radius:5px;
+}
+
+.action-buttons button:hover{
+background:#16a34a;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- MATRIX CANVAS -->
+
+<canvas id="matrix"></canvas>
+
+<!-- NAVBAR -->
+
+<div class="navbar">
+
+<h2>Cyber Threat Intelligence</h2>
+
+<div>
+
+<a href="/dashboard">Home</a>
+<a href="/scanner">Scanner</a>
+<a href="/history">History</a>
+<a href="/statistics">Statistics</a>
+<a href="/map">Threat Map</a>
+<a href="/about">About</a>
+<a href="/contact">Contact</a>
+<a href="/profile">Profile</a>
+<a href="/logout">Logout</a>
+
+</div>
+
+</div>
+
+<!-- SIDEBAR -->
+
+{% include "components/sidebar.html" %}
+
+<!-- MAIN CONTENT -->
+
+<div class="main">
+
+<h1>Threat Intelligence Dashboard</h1>
+
+<div class="card">
+<h3>Total Scans</h3>
+<h1>{{total}}</h1>
+</div>
+
+<div class="card">
+<h3>High Risk</h3>
+<h1>{{high}}</h1>
+</div>
+
+<div class="card">
+<h3>Low Risk</h3>
+<h1>{{low}}</h1>
+</div>
+
+<div class="chartbox">
+<canvas id="chart"></canvas>
+</div>
+
+<div class="action-buttons">
+
+<a href="/scanner">
+<button>IP Scanner</button>
+</a>
+
+<a href="/history">
+<button>View Scan History</button>
+</a>
+
+<a href="/statistics">
+<button>View Statistics</button>
+</a>
+
+</div>
+
+</div>
+
+<!-- CHART -->
+
+<script>
+
+const ctx = document.getElementById("chart");
+
+new Chart(ctx,{
+
+type:"bar",
+
+data:{
+labels:["High Risk","Low Risk"],
+datasets:[{
+label:"Threat Analysis",
+data:[{{high}},{{low}}],
+backgroundColor:["#ef4444","#22c55e"]
+}]
+},
+
+options:{
+responsive:true,
+plugins:{
+legend:{
+labels:{color:"white"}
+}
+},
+scales:{
+x:{ticks:{color:"white"}},
+y:{ticks:{color:"white"}}
+}
+}
+
+})
+
+</script>
+
+
+<!-- MATRIX RAIN SCRIPT -->
+
+<script>
+
+const canvas = document.getElementById("matrix");
+const ctx2 = canvas.getContext("2d");
+
+canvas.height = window.innerHeight;
+canvas.width = window.innerWidth;
+
+const letters = "01";
+const matrix = letters.split("");
+
+const font_size = 14;
+const columns = canvas.width/font_size;
+
+const drops = [];
+
+for(let x = 0; x < columns; x++)
+drops[x] = 1;
+
+function draw(){
+
+ctx2.fillStyle = "rgba(2,6,23,0.05)";
+ctx2.fillRect(0,0,canvas.width,canvas.height);
+
+ctx2.fillStyle = "#22c55e";
+ctx2.font = font_size + "px monospace";
+
+for(let i = 0; i < drops.length; i++){
+
+const text = matrix[Math.floor(Math.random()*matrix.length)];
+
+ctx2.fillText(text,i*font_size,drops[i]*font_size);
+
+if(drops[i]*font_size > canvas.height && Math.random() > 0.975)
+drops[i] = 0;
+
+drops[i]++;
+
+}
+
+}
+
+setInterval(draw,35);
+
+</script>
+
+<footer style="
+text-align:center;
+margin-top:40px;
+padding:15px;
+font-size:14px;
+color:#888;">
+
+Made by <strong>Ayush & Tejas</strong>
+
+</footer>
+
+</body>
+
+</html>

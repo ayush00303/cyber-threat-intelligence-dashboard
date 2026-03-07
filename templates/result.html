@@ -1,111 +1,204 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <title>Scan Result</title>
-    <link rel="stylesheet" href="/static/style.css">
+<title>Scan Result</title>
+
+<link rel="stylesheet" href="/static/style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+.result-box{
+
+width:420px;
+margin:80px auto;
+background:#1e293b;
+padding:30px;
+border-radius:10px;
+text-align:center;
+
+box-shadow:0 0 20px rgba(0,0,0,0.5);
+
+}
+
+.result-box h2{
+color:#38bdf8;
+}
+
+.badge{
+padding:10px;
+border-radius:8px;
+width:200px;
+margin:15px auto;
+font-weight:bold;
+}
+
+.high{background:#ff4d4d;}
+.medium{background:#ff9900;}
+.low{background:#00cc66;}
+
+.flag{
+font-size:26px;
+}
+
+.links a{
+display:block;
+margin-top:10px;
+color:#38bdf8;
+text-decoration:none;
+}
+
+.links a:hover{
+text-decoration:underline;
+}
+
+</style>
+
 </head>
+
 <body>
-    <div class="container">
-        <h2>Scan Result</h2>
-        <p><strong>IP:</strong> {{ ip }}</p>
-        <p><strong>Country:</strong> {{ country }}</p>
-        <p><strong>Risk Score:</strong> {{ risk_score }}</p>
 
-       {% if risk_score > 60 %}
-    <div style="background-color:#ff4d4d; 
-                padding:10px; 
-                border-radius:8px; 
-                width:200px; 
-                margin:10px auto; 
-                font-weight:bold;">
-        🚨 HIGH RISK
-    </div>
+<div class="result-box">
 
-{% elif risk_score > 30 %}
-    <div style="background-color:#ff9900; 
-                padding:10px; 
-                border-radius:8px; 
-                width:200px; 
-                margin:10px auto; 
-                font-weight:bold;">
-        ⚠️ MEDIUM RISK
-    </div>
+<h2>Scan Result</h2>
 
-{% else %}
-    <div style="background-color:#00cc66; 
-                padding:10px; 
-                border-radius:8px; 
-                width:200px; 
-                margin:10px auto; 
-                font-weight:bold;">
-        ✅ LOW RISK
-    </div>
-{% endif %}
-<br>
-<a href="/history">View Scan History</a>
-<br>
-        <a href="/">Scan Another</a>
-    </div>
-    <div style="width:300px; margin: auto;">
-    <canvas id="riskChart"></canvas>
+<p><strong>IP:</strong> {{ ip }}</p>
+
+<p>
+<strong>Country:</strong> 
+<span class="flag">
+{{ country }}
+</span>
+</p>
+
+<p><strong>Risk Score:</strong> {{ risk_score }}%</p>
+
+
+{% if risk_score > 60 %}
+
+<div class="badge high">
+🚨 HIGH RISK IP
 </div>
 
+{% elif risk_score > 30 %}
+
+<div class="badge medium">
+⚠️ MEDIUM RISK
+</div>
+
+{% else %}
+
+<div class="badge low">
+✅ LOW RISK
+</div>
+
+{% endif %}
+
+
+<div style="width:280px; margin:auto; margin-top:20px;">
+<canvas id="riskChart"></canvas>
+</div>
+
+<div class="links">
+
+<a href="/history">View Scan History</a>
+
+<a href="/">Scan Another IP</a>
+
+</div>
+
+</div>
+
+
 <script>
+
 var ctx = document.getElementById('riskChart').getContext('2d');
 
 var riskChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-        labels: ['Risk', 'Safe'],
-        datasets: [{
-            data: [{{ risk_score }}, 100 - {{ risk_score }}],
-            backgroundColor: ['#ff4d4d', '#00ff99'],
-            borderWidth: 1
-        }]
-    },
-    options: {
-        cutout: '70%',
-        plugins: {
-            legend: {
-                labels: {
-                    color: "white"
-                }
-            }
-        }
-    },
-    plugins: [{
-        id: 'textCenter',
-        beforeDraw: function(chart) {
-            var width = chart.width,
-                height = chart.height,
-                ctx = chart.ctx;
 
-            ctx.restore();
-            var fontSize = (height / 6).toFixed(2);
-            ctx.font = fontSize + "px Arial";
-            ctx.fillStyle = "white";
-            ctx.textBaseline = "middle";
+type: 'doughnut',
 
-            var text = "{{ risk_score }}%",
-                textX = Math.round((width - ctx.measureText(text).width) / 2),
-                textY = height / 2;
+data: {
 
-            ctx.fillText(text, textX, textY);
-            ctx.save();
-        }
-    }]
+labels: ['Risk','Safe'],
+
+datasets: [{
+
+data: [{{ risk_score }}, 100 - {{ risk_score }}],
+
+backgroundColor: ['#ff4d4d','#00ff99'],
+
+borderWidth:1
+
+}]
+
+},
+
+options:{
+
+cutout:'70%',
+
+plugins:{
+legend:{
+labels:{color:"white"}
+}
+}
+
+},
+
+plugins:[{
+
+id:'textCenter',
+
+beforeDraw:function(chart){
+
+var width = chart.width;
+var height = chart.height;
+var ctx = chart.ctx;
+
+ctx.restore();
+
+var fontSize = (height/6).toFixed(2);
+
+ctx.font = fontSize+"px Arial";
+
+ctx.fillStyle="white";
+
+ctx.textBaseline="middle";
+
+var text="{{ risk_score }}%";
+
+var textX=Math.round((width-ctx.measureText(text).width)/2);
+
+var textY=height/2;
+
+ctx.fillText(text,textX,textY);
+
+ctx.save();
+
+}
+
+}]
+
 });
+
 </script>
-</script>
+
 <footer style="
-    text-align:center;
-    margin-top:40px;
-    padding:15px;
-    font-size:14px;
-    color:#888;">
-    Made by  <strong>Ayush & Tejas </strong>
+text-align:center;
+margin-top:40px;
+padding:15px;
+font-size:14px;
+color:#888;
+">
+
+Made by <strong>Ayush & Tejas</strong>
+
 </footer>
+
 </body>
+
 </html>

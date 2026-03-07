@@ -2,52 +2,115 @@
 <html>
 <head>
     <title>Threat Statistics</title>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <link rel="stylesheet" href="/static/style.css">
+
+    <style>
+        body{
+            background:#0f172a;
+            color:white;
+            font-family:monospace;
+        }
+
+        .container{
+            text-align:center;
+            margin-top:60px;
+        }
+
+        .card{
+            background:#1e293b;
+            padding:20px;
+            border-radius:10px;
+            margin:10px auto;
+            width:350px;
+        }
+
+        canvas{
+            margin-top:20px;
+        }
+    </style>
+
 </head>
 <body>
 
 <div class="container">
-    <h1>Threat Intelligence Statistics</h1>
 
-    <p><strong>Total Scans:</strong> {{ total }}</p>
-    <p><strong>High Risk:</strong> {{ high }}</p>
-    <p><strong>Low Risk:</strong> {{ low }}</p>
+<h1>Threat Intelligence Statistics</h1>
 
-    <div style="width:300px; margin:20px auto;">
-    <canvas id="statsChart"></canvas>
+<div class="card">
+<p><strong>Total Scans:</strong> {{ total }}</p>
+<p><strong>High Risk:</strong> {{ high }}</p>
+<p><strong>Low Risk:</strong> {{ low }}</p>
 </div>
 
+<div style="width:350px; margin:20px auto;">
+<canvas id="statsChart"></canvas>
+</div>
 
-    <br>
-    <a href="/">Back to Home</a>
+<br>
+<a href="/">Back to Home</a>
+
 </div>
 
 <script>
-const ctx = document.getElementById('statsChart').getContext('2d');
+
+const ctx = document.getElementById('statsChart');
+
 new Chart(ctx, {
-    type: 'pie',
-    data: {
-        labels: ['High Risk', 'Low Risk'],
-        datasets: [{
-            data: [{{ high }}, {{ low }}],
-            backgroundColor: ['#ff4444', '#00C851']
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: true
-    }
+
+type:'doughnut',
+
+data:{
+labels:['High Risk','Low Risk'],
+datasets:[{
+
+data:[{{high}},{{low}}],
+
+backgroundColor:[
+'#ff4d4d',
+'#00ff9c'
+],
+
+borderWidth:2
+
+}]
+},
+
+options:{
+
+responsive:true,
+
+animation:{
+duration:2000,
+easing:'easeOutBounce'
+},
+
+plugins:{
+legend:{
+labels:{
+color:'white'
+}
+}
+}
+
+}
+
 });
 
 </script>
+
 <footer style="
-    text-align:center;
-    margin-top:40px;
-    padding:15px;
-    font-size:14px;
-    color:#888;">
-    Made by  <strong>Ayush & Tejas </strong>
+text-align:center;
+margin-top:40px;
+padding:15px;
+font-size:14px;
+color:#888;">
+
+Made by <strong>Ayush & Tejas</strong>
+
 </footer>
+
 </body>
 </html>

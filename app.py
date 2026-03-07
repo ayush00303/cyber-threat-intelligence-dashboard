@@ -1,195 +1,412 @@
-from flask import Flask, render_template, request
-from flask import Response
-import requests
+from flask import Flask, render_template, request, redirect, session, Response
 import sqlite3
+import requests
 import datetime
 import ipaddress
 
 app = Flask(__name__)
+app.secret_key = "secret123"
 
-# Create database table
+
 # -------------------------------
+# DATABASE INITIALIZATION
+# -------------------------------
+
 def init_db():
+
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
+
     cursor.execute("""
-        CREATE TABLE IF NOT EXISTS scans (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            ip TEXT,
-            country TEXT,
-            risk_score INTEGER,
-            date TEXT
-        )
+    CREATE TABLE IF NOT EXISTS users(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        email TEXT,
+        password TEXT
+    )
     """)
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS scans(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ip TEXT,
+        country TEXT,
+        risk_score INTEGER,
+        date TEXT
+    )
+    """)
+
     conn.commit()
     conn.close()
+
 
 init_db()
 
 
-# Risk Calculation Logic
+# -------------------------------
+# RISK CALCULATION
+# -------------------------------
 
 def calculate_risk(country):
-    score = 0
-    high_risk_countries = ["Russia", "China", "Iran", "North Korea"]
+
+    high_risk = ["Russia","China","Iran","North Korea"]
 
     if country == "Unknown":
-        score += 10
-    elif country in high_risk_countries:
-        score += 70
-    else:
-        score += 20
+        return 10
 
-    return score
+    if country in high_risk:
+        return 70
+
+    return 20
 
 
-@app.route("/", methods=["GET", "POST"])
-def index():
+# -------------------------------
+# HOME
+# -------------------------------
+
+@app.route("/")
+def home():
+
+    if "user" in session:
+        return redirect("/dashboard")
+
+    return redirect("/register")
+
+
+# -------------------------------
+# REGISTER
+# -------------------------------
+
+@app.route("/register", methods=["GET","POST"])
+def register():
+
+    if "user" in session:
+        return redirect("/dashboard")
+
     if request.method == "POST":
-        ip = request.form["ip"]
 
-        #  Private IP Detection
-        try:
-            ip_obj = ipaddress.ip_address(ip)
+        username = request.form["username"]
+        email = request.form["email"]
+        password = request.form["password"]
 
-            if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_reserved:
-                country = "Private / Reserved IP"
-                risk_score = 0
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
 
-                # Save in DB
-                conn = sqlite3.connect("database.db")
-                cursor = conn.cursor()
-                cursor.execute(
-                    "INSERT INTO scans (ip, country, risk_score, date) VALUES (?, ?, ?, ?)",
-                    (ip, country, risk_score, str(datetime.datetime.now()))
-                )
-                conn.commit()
-                conn.close()
+        cursor.execute(
+        "INSERT INTO users(username,email,password) VALUES(?,?,?)",
+        (username,email,password)
+        )
 
-                return render_template("result.html",
-                                       ip=ip,
-                                       country=country,
-                                       risk_score=risk_score)
-        except:
-            return "Invalid IP Address"
+        conn.commit()
+        conn.close()
 
-        #  Public IP API Call
-        try:
-            response = requests.get(f"http://ip-api.com/json/{ip}")
-            data = response.json()
+        return redirect("/login")
 
-            country = data.get("country", "Unknown")
-            risk_score = calculate_risk(country)
-
-            # Save in DB
-            
-            conn = sqlite3.connect("database.db")
-            cursor = conn.cursor()
-            cursor.execute(
-                "INSERT INTO scans (ip, country, risk_score, date) VALUES (?, ?, ?, ?)",
-                (ip, country, risk_score, str(datetime.datetime.now()))
-            )
-            conn.commit()
-            conn.close()
-
-            return render_template("result.html",
-                                   ip=ip,
-                                   country=country,
-                                   risk_score=risk_score)
-
-        except:
-            return "Error fetching data from API"
-
-    return render_template("index.html")
+    return render_template("register.html")
 
 
+# -------------------------------
+# LOGIN
+# -------------------------------
 
-# History Page
+@app.route("/login", methods=["GET","POST"])
+def login():
 
-@app.route("/history")
-def history():
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM scans ORDER BY id DESC")
-    data = cursor.fetchall()
-    conn.close()
-    return render_template("history.html", scans=data)
+    if request.method == "POST":
 
+        email = request.form["email"]
+        password = request.form["password"]
 
-#Add professional API route
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
 
-@app.route("/api/scan/<ip>")
-def api_scan(ip):
-    try:
-        ip_obj = ipaddress.ip_address(ip)
+        cursor.execute(
+        "SELECT * FROM users WHERE email=? AND password=?",
+        (email,password)
+        )
 
-        if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_reserved:
-            return {
-                "ip": ip,
-                "country": "Private / Reserved IP",
-                "risk_score": 0
-            }
+        user = cursor.fetchone()
 
-        response = requests.get(f"http://ip-api.com/json/{ip}")
-        data = response.json()
+        conn.close()
 
-        country = data.get("country", "Unknown")
-        risk_score = calculate_risk(country)
+        if user:
+            session["user"] = user[1]
+            return redirect("/dashboard")
 
-        return {
-            "ip": ip,
-            "country": country,
-            "risk_score": risk_score
-        }
+        else:
+            return "Incorrect email or password"
 
-    except:
-        return {
-            "error": "Invalid IP address"
-        }
+    return render_template("login.html")
 
 
-@app.route("/export")
-def export_csv():
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT * FROM scans ORDER BY id DESC")
-    data = cursor.fetchall()
-    conn.close()
+# -------------------------------
+# DASHBOARD
+# -------------------------------
 
-    def generate():
-        yield "ID,IP,Country,Risk Score,Date\n"
-        for row in data:
-            yield f"{row[0]},{row[1]},{row[2]},{row[3]},{row[4]}\n"
+@app.route("/dashboard")
+def dashboard():
 
-    return Response(generate(),
-                    mimetype="text/csv",
-                    headers={"Content-Disposition":
-                             "attachment; filename=scan_report.csv"})
+    if "user" not in session:
+        return redirect("/login")
 
-
-#statistics page
-
-@app.route("/statistics")
-def statistics():
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
 
     cursor.execute("SELECT COUNT(*) FROM scans")
     total = cursor.fetchone()[0]
 
-    cursor.execute("SELECT COUNT(*) FROM scans WHERE risk_score >= 70")
+    cursor.execute("SELECT COUNT(*) FROM scans WHERE risk_score>50")
     high = cursor.fetchone()[0]
 
-    cursor.execute("SELECT COUNT(*) FROM scans WHERE risk_score < 70")
+    cursor.execute("SELECT COUNT(*) FROM scans WHERE risk_score<=50")
     low = cursor.fetchone()[0]
 
     conn.close()
 
-    return render_template("statistics.html",
-                           total=total,
-                           high=high,
-                           low=low)
+    return render_template(
+        "dashboard.html",
+        total=total,
+        high=high,
+        low=low
+    )
 
+
+# -------------------------------
+# SCANNER
+# -------------------------------
+
+@app.route("/scanner", methods=["GET","POST"])
+def scanner():
+
+    if "user" not in session:
+        return redirect("/login")
+
+    if request.method == "POST":
+
+        ip = request.form["ip"]
+
+        try:
+
+            ip_obj = ipaddress.ip_address(ip)
+
+            # Private IP detection
+            if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_reserved:
+                country = "Private / Reserved IP"
+                risk_score = 0
+
+            else:
+
+                response = requests.get(
+                    f"http://ip-api.com/json/{ip}",
+                    timeout=5
+                )
+
+                data = response.json()
+
+                country = data.get("country","Unknown")
+
+                risk_score = calculate_risk(country)
+
+            # Save scan
+            conn = sqlite3.connect("database.db")
+            cursor = conn.cursor()
+
+            cursor.execute(
+            "INSERT INTO scans(ip,country,risk_score,date) VALUES(?,?,?,?)",
+            (ip,country,risk_score,str(datetime.datetime.now()))
+            )
+
+            conn.commit()
+            conn.close()
+
+            return render_template(
+                "result.html",
+                ip=ip,
+                country=country,
+                risk_score=risk_score
+            )
+
+        except:
+            return "Invalid IP Address"
+
+    return render_template("index.html")
+
+
+# -------------------------------
+# HISTORY
+# -------------------------------
+
+@app.route("/history")
+def history():
+
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM scans ORDER BY id DESC")
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return render_template("history.html",scans=data)
+
+
+# -------------------------------
+# STATISTICS
+# -------------------------------
+
+@app.route("/statistics")
+def statistics():
+
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT COUNT(*) FROM scans")
+    total = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM scans WHERE risk_score>=70")
+    high = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM scans WHERE risk_score<70")
+    low = cursor.fetchone()[0]
+
+    conn.close()
+
+    return render_template(
+    "statistics.html",
+    total=total,
+    high=high,
+    low=low
+    )
+
+
+# -------------------------------
+# EXPORT CSV
+# -------------------------------
+
+@app.route("/export")
+def export():
+
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM scans")
+    data = cursor.fetchall()
+
+    conn.close()
+
+    def generate():
+
+        yield "ID,IP,Country,Risk Score,Date\n"
+
+        for row in data:
+            yield f"{row[0]},{row[1]},{row[2]},{row[3]},{row[4]}\n"
+
+    return Response(
+    generate(),
+    mimetype="text/csv",
+    headers={"Content-Disposition":"attachment; filename=report.csv"}
+    )
+
+
+# -------------------------------
+# OTHER PAGES
+# -------------------------------
+
+@app.route("/profile")
+def profile():
+    return render_template("profile.html")
+
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
+
+
+@app.route("/admin")
+def admin():
+
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM users")
+    users = cursor.fetchall()
+
+    conn.close()
+
+    return render_template("admin.html",users=users)
+
+
+@app.route("/map")
+def map():
+    return render_template("map.html")
+
+
+# -------------------------------
+# CHANGE PASSWORD
+# -------------------------------
+
+@app.route("/change-password", methods=["GET","POST"])
+def change_password():
+
+    if "user" not in session:
+        return redirect("/login")
+
+    if request.method == "POST":
+
+        old = request.form["old_password"]
+        new = request.form["new_password"]
+
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
+
+        cursor.execute(
+        "SELECT * FROM users WHERE username=? AND password=?",
+        (session["user"],old)
+        )
+
+        user = cursor.fetchone()
+
+        if user:
+
+            cursor.execute(
+            "UPDATE users SET password=? WHERE username=?",
+            (new,session["user"])
+            )
+
+            conn.commit()
+            conn.close()
+
+            return "Password Updated Successfully"
+
+        else:
+            return "Old password incorrect"
+
+    return render_template("change_password.html")
+
+
+# -------------------------------
+# LOGOUT
+# -------------------------------
+
+@app.route("/logout")
+def logout():
+
+    session.clear()
+
+    return redirect("/login")
+
+
+@app.route("/forgot")
+def forgot():
+    return render_template("forgot.html")
+
+
+# -------------------------------
 
 if __name__ == "__main__":
     app.run(debug=True)

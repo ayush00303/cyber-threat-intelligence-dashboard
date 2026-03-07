@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>About Project</title>
+
+<link rel="stylesheet" href="/static/dashboard.css">
+
+<style>
+
+.about-box{
+max-width:900px;
+margin:40px auto;
+background:#1e293b;
+padding:30px;
+border-radius:10px;
+line-height:1.6;
+}
+
+.about-box h1{
+color:#38bdf8;
+margin-bottom:20px;
+}
+
+.about-box h2{
+color:#38bdf8;
+margin-top:25px;
+}
+
+.about-box p{
+margin-top:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+{% include "components/sidebar.html" %}
+
+<div class="main">
+
+<div class="about-box">
+
+<h1>About Cyber Threat Intelligence Dashboard</h1>
+
+<p>
+The Cyber Threat Intelligence Dashboard is a web-based cybersecurity monitoring tool
+developed using Python and Flask. The main objective of this project is to analyze IP
+addresses and identify potential cyber threats based on geographic risk analysis.
+</p>
+
+<p>
+This system helps security analysts understand suspicious IP activity by collecting
+threat intelligence data and presenting it through an easy-to-use dashboard interface.
+The tool is designed to simulate how Security Operations Centers (SOC) monitor network
+traffic and identify potential malicious activity.
+</p>
+
+<h2>Project Objectives</h2>
+
+<p>
+• Monitor suspicious IP addresses.<br>
+• Identify high-risk geographic locations.<br>
+• Visualize cyber threat intelligence using dashboards and charts.<br>
+• Maintain a scan history for investigation and analysis.<br>
+</p>
+
+<h2>Key Features</h2>
+
+<p>
+• User Authentication System (Register / Login)<br>
+• IP Address Threat Analysis<br>
+• Risk Score Detection<br>
+• Threat Statistics Visualization<br>
+• Scan History Logging<br>
+• CSV Export for Reports<br>
+• Admin Panel for User Monitoring<br>
+• Change Password System<br>
+</p>
+
+<h2>Technologies Used</h2>
+
+<p>
+Frontend : HTML, CSS, JavaScript<br>
+Backend : Python Flask Framework<br>
+Database : SQLite Database<br>
+Visualization : Chart.js<br>
+</p>
+
+<h2>Cyber Security Relevance</h2>
+
+<p>
+This project demonstrates how cyber security professionals use threat intelligence
+tools to analyze network activity. By evaluating IP information and geographic
+risk levels, security teams can detect suspicious behavior and prevent potential
+cyber attacks.
+</p>
+
+<p>
+The dashboard represents a simplified model of a Security Operations Center (SOC)
+environment where analysts monitor threats and investigate suspicious IP addresses.
+</p>
+
+</div>
+
+</div>
+
+<footer style="
+text-align:center;
+margin-top:40px;
+padding:15px;
+font-size:14px;
+color:#888;">
+
+Made by <strong>Ayush & Tejas</strong>
+
+</footer>
+
+</body>
+
+</html>

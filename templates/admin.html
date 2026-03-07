@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Admin Panel</title>
+
+<link rel="stylesheet" href="/static/dashboard.css">
+
+<style>
+
+/* CENTER LAYOUT */
+
+.admin-wrapper{
+margin-left:260px;
+padding:60px;
+display:flex;
+justify-content:center;
+align-items:flex-start;
+}
+
+/* CARD */
+
+.admin-card{
+background:#1e293b;
+padding:40px;
+border-radius:12px;
+width:800px;
+max-width:90%;
+box-shadow:0 0 15px rgba(0,0,0,0.6);
+animation:fadein 1s ease;
+}
+
+/* TITLE */
+
+.admin-title{
+color:#38bdf8;
+margin-bottom:25px;
+font-size:26px;
+}
+
+/* TABLE */
+
+.admin-table{
+width:100%;
+border-collapse:collapse;
+}
+
+.admin-table th{
+background:#020617;
+color:#22c55e;
+padding:14px;
+text-align:left;
+font-size:15px;
+border-bottom:1px solid #334155;
+}
+
+.admin-table td{
+padding:14px;
+border-bottom:1px solid #334155;
+color:#e2e8f0;
+}
+
+/* ROW HOVER */
+
+.admin-table tr:hover{
+background:#0f172a;
+}
+
+/* USER COUNTER */
+
+.user-counter{
+margin-top:30px;
+padding:20px;
+background:#020617;
+border-radius:10px;
+text-align:center;
+}
+
+.user-counter h3{
+color:#38bdf8;
+margin-bottom:10px;
+}
+
+.counter{
+font-size:35px;
+color:#22c55e;
+font-weight:bold;
+}
+
+/* FADE ANIMATION */
+
+@keyframes fadein{
+
+from{
+opacity:0;
+transform:translateY(20px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+{% include "components/sidebar.html" %}
+
+<div class="admin-wrapper">
+
+<div class="admin-card">
+
+<h2 class="admin-title">Admin Panel</h2>
+
+<table class="admin-table">
+
+<tr>
+<th>ID</th>
+<th>Username</th>
+<th>Email</th>
+</tr>
+
+{% for user in users %}
+
+<tr>
+<td>{{ user[0] }}</td>
+<td>{{ user[1] }}</td>
+<td>{{ user[2] }}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+
+<!-- USER COUNT -->
+
+<div class="user-counter">
+
+<h3>Total Registered Users</h3>
+
+<div class="counter" id="userCount">
+0
+</div>
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<script>
+
+/* USER COUNT ANIMATION */
+
+let target = {{ users|length }};
+let count = 0;
+
+let counter = document.getElementById("userCount");
+
+let interval = setInterval(function(){
+
+count++;
+
+counter.innerText = count;
+
+if(count >= target){
+clearInterval(interval);
+}
+
+},80);
+
+</script>
+
+</body>
+
+</html>

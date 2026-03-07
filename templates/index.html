@@ -1,31 +1,180 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Cyber Threat Intelligence</title>
-    <link rel="stylesheet" href="/static/style.css">
+
+<title>Cyber Threat Intelligence</title>
+
+<link rel="stylesheet" href="/static/style.css">
+
+<style>
+
+/* CYBER GRID BACKGROUND */
+
+body{
+
+margin:0;
+font-family:Arial;
+color:white;
+
+background-image:
+linear-gradient(#1e293b 1px, transparent 1px),
+linear-gradient(90deg,#1e293b 1px, transparent 1px);
+
+background-size:40px 40px;
+
+animation:gridmove 12s linear infinite;
+
+}
+
+@keyframes gridmove{
+
+0%{
+background-position:0 0;
+}
+
+100%{
+background-position:40px 40px;
+}
+
+}
+
+/* SCANNER BOX */
+
+.container{
+
+width:350px;
+margin:120px auto;
+background:#1e293b;
+padding:30px;
+border-radius:10px;
+text-align:center;
+
+box-shadow:0 0 20px rgba(0,0,0,0.5);
+
+}
+
+/* INPUT */
+
+input{
+
+display:block;
+margin:10px auto;
+padding:10px;
+width:250px;
+border:none;
+border-radius:5px;
+
+}
+
+/* BUTTON */
+
+button{
+
+padding:10px 20px;
+background:#38bdf8;
+border:none;
+color:white;
+cursor:pointer;
+border-radius:5px;
+transition:0.3s;
+
+}
+
+button:hover{
+
+background:#0ea5e9;
+transform:scale(1.05);
+
+}
+
+/* LOADER */
+
+.loader{
+
+display:none;
+color:#22c55e;
+font-family:monospace;
+margin-bottom:15px;
+font-size:18px;
+
+animation:blink 1s infinite;
+
+}
+
+@keyframes blink{
+
+0%{opacity:1}
+50%{opacity:0}
+100%{opacity:1}
+
+}
+
+</style>
+
 </head>
+
 <body>
-    <div class="container">
-        <h1>Cyber Threat Intelligence Dashboard</h1>
-        <form method="POST">
-            <br>
-<div style="text-align:center; margin-bottom:15px;">
-    <a href="/statistics" style="color:#00C851; font-weight:bold;">
-        View Statistics
-    </a>
+
+<div class="container">
+
+<h1>Cyber Threat Scanner</h1>
+
+<!-- Statistics Link -->
+
+<div style="text-align:center; margin-bottom:20px;">
+
+<a href="/statistics" style="color:#00C851; font-weight:bold;">
+View Statistics
+</a>
+
 </div>
-            <input type="text" name="ip" placeholder="Enter IP Address" required>
-            <button type="submit">Scan</button>
-        </form>
-    </div>
-    <footer style="
-    text-align:center;
-    margin-top:40px;
-    padding:15px;
-    font-size:14px;
-    color:#888;">
-    Made by  <strong>Ayush & Tejas </strong>
+
+<!-- SCAN LOADER -->
+
+<div id="loader" class="loader">
+Scanning IP...
+</div>
+
+<!-- Scanner Form -->
+
+<form method="POST" action="/scanner" onsubmit="showLoader()">
+
+<input 
+type="text" 
+name="ip" 
+placeholder="Enter IP Address"
+required
+>
+
+<button type="submit">Scan IP</button>
+
+</form>
+
+</div>
+
+<footer style="
+text-align:center;
+margin-top:40px;
+padding:15px;
+font-size:14px;
+color:#888;
+">
+
+Made by <strong>Ayush & Tejas</strong>
+
 </footer>
 
+<script>
+
+function showLoader(){
+
+document.getElementById("loader").style.display="block";
+
+}
+
+</script>
+
 </body>
+
 </html>

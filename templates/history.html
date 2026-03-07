@@ -1,53 +1,118 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Scan History</title>
-    <link rel="stylesheet" href="/static/style.css">
+
+<title>Scan History</title>
+
+<link rel="stylesheet" href="/static/dashboard.css">
+
+<style>
+
+/* TABLE STYLE */
+
+.history-table{
+width:100%;
+border-collapse:collapse;
+margin-top:20px;
+background:#1e293b;
+border-radius:10px;
+overflow:hidden;
+}
+
+.history-table th{
+background:#020617;
+color:#38bdf8;
+padding:12px;
+text-align:left;
+}
+
+.history-table td{
+padding:12px;
+border-bottom:1px solid #334155;
+}
+
+.history-table tr:hover{
+background:#0f172a;
+}
+
+/* BUTTON */
+
+.csv-btn{
+background:#22c55e;
+padding:10px 18px;
+color:white;
+text-decoration:none;
+border-radius:6px;
+}
+
+.csv-btn:hover{
+background:#16a34a;
+}
+
+</style>
+
 </head>
+
 <body>
-    <div class="container">
-        <h2>Scan History</h2>
-        <div style="text-align:center; margin:15px;">
-    <a href="/export" style="
-        background:#00C851;
-        padding:8px 15px;
-        color:white;
-        text-decoration:none;
-        border-radius:6px;">
-        Download CSV Report
-    </a>
+
+{% include "components/sidebar.html" %}
+
+<div class="main">
+
+<h1>Scan History</h1>
+
+<br>
+
+<a href="/export" class="csv-btn">
+Download CSV Report
+</a>
+
+<br><br>
+
+<table class="history-table">
+
+<tr>
+<th>ID</th>
+<th>IP Address</th>
+<th>Country</th>
+<th>Risk Score</th>
+<th>Date</th>
+</tr>
+
+{% for scan in scans %}
+
+<tr>
+<td>{{ scan[0] }}</td>
+<td>{{ scan[1] }}</td>
+<td>{{ scan[2] }}</td>
+<td>{{ scan[3] }}</td>
+<td>{{ scan[4] }}</td>
+</tr>
+
+{% endfor %}
+
+</table>
+
+<br><br>
+
+<a href="/dashboard">
+<button>Back to Dashboard</button>
+</a>
+
 </div>
 
-     <table border="1" style="margin:auto; color:white; padding:10px;">
-            <tr>
-                <th>ID</th>
-                <th>IP</th>
-                <th>Country</th>
-                <th>Risk Score</th>
-                <th>Date</th>
-            </tr>
+<footer style="
+text-align:center;
+margin-top:40px;
+padding:15px;
+font-size:14px;
+color:#888;
+">
 
-            {% for scan in scans %}
-            <tr>
-                <td>{{ scan[0] }}</td>
-                <td>{{ scan[1] }}</td>
-                <td>{{ scan[2] }}</td>
-                <td>{{ scan[3] }}</td>
-                <td>{{ scan[4] }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+Made by <strong>Ayush & Tejas</strong>
 
-        <br>
-        <a href="/">Back to Dashboard</a>
-    </div>
-    <footer style="
-    text-align:center;
-    margin-top:40px;
-    padding:15px;
-    font-size:14px;
-    color:#888;">
-    Made by  <strong>Ayush & Tejas </strong>
 </footer>
+
 </body>
 </html>

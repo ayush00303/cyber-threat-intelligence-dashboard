@@ -1,35 +1,87 @@
 <!DOCTYPE html>
+
 <html>
 
 <head>
 
-<title>About Project</title>
+<title>About - Cyber Threat Intelligence</title>
 
 <link rel="stylesheet" href="/static/dashboard.css">
 
 <style>
 
-.about-box{
+.about-wrapper{
+margin-left:260px;
+padding:60px;
 max-width:900px;
-margin:40px auto;
-background:#1e293b;
-padding:30px;
-border-radius:10px;
-line-height:1.6;
 }
 
-.about-box h1{
+.about-card{
+background:#1e293b;
+padding:40px;
+border-radius:12px;
+box-shadow:0 0 20px rgba(0,0,0,0.6);
+animation:fadein 0.8s ease;
+}
+
+.about-card h1{
 color:#38bdf8;
 margin-bottom:20px;
 }
 
-.about-box h2{
-color:#38bdf8;
-margin-top:25px;
+.about-card h2{
+color:#22c55e;
+margin-top:30px;
 }
 
-.about-box p{
+.about-card p{
+line-height:1.7;
+color:#cbd5f5;
+}
+
+.feature-list{
 margin-top:10px;
+padding-left:20px;
+}
+
+.feature-list li{
+margin-bottom:10px;
+}
+
+.tech-list{
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+margin-top:10px;
+}
+
+.tech{
+background:#020617;
+padding:8px 12px;
+border-radius:6px;
+border:1px solid #334155;
+}
+
+.dev-box{
+margin-top:30px;
+background:#020617;
+padding:20px;
+border-radius:10px;
+border:1px solid #334155;
+}
+
+@keyframes fadein{
+
+from{
+opacity:0;
+transform:translateY(20px);
+}
+
+to{
+opacity:1;
+transform:translateY(0);
+}
+
 }
 
 </style>
@@ -40,84 +92,112 @@ margin-top:10px;
 
 {% include "components/sidebar.html" %}
 
-<div class="main">
+<div class="about-wrapper">
 
-<div class="about-box">
+<div class="about-card">
 
 <h1>About Cyber Threat Intelligence Dashboard</h1>
 
 <p>
-The Cyber Threat Intelligence Dashboard is a web-based cybersecurity monitoring tool
-developed using Python and Flask. The main objective of this project is to analyze IP
-addresses and identify potential cyber threats based on geographic risk analysis.
+Cyber Threat Intelligence Dashboard is a cybersecurity monitoring tool designed
+to analyze IP addresses, detect potential threats, and visualize security data.
+The project demonstrates how security analysts can gather intelligence about
+network activity and detect suspicious behavior using publicly available data
+sources and threat intelligence techniques.
 </p>
 
 <p>
-This system helps security analysts understand suspicious IP activity by collecting
-threat intelligence data and presenting it through an easy-to-use dashboard interface.
-The tool is designed to simulate how Security Operations Centers (SOC) monitor network
-traffic and identify potential malicious activity.
-</p>
-
-<h2>Project Objectives</h2>
-
-<p>
-• Monitor suspicious IP addresses.<br>
-• Identify high-risk geographic locations.<br>
-• Visualize cyber threat intelligence using dashboards and charts.<br>
-• Maintain a scan history for investigation and analysis.<br>
+The system allows users to scan IP addresses, check potential risks, store scan
+history, generate statistics, and analyze malicious URLs using VirusTotal API.
+It simulates the workflow used by Security Operations Centers (SOC) to monitor
+threats and investigate suspicious activity.
 </p>
 
 <h2>Key Features</h2>
 
-<p>
-• User Authentication System (Register / Login)<br>
-• IP Address Threat Analysis<br>
-• Risk Score Detection<br>
-• Threat Statistics Visualization<br>
-• Scan History Logging<br>
-• CSV Export for Reports<br>
-• Admin Panel for User Monitoring<br>
-• Change Password System<br>
-</p>
+<ul class="feature-list">
+
+<li>IP Address Threat Detection</li>
+
+<li>Country and ISP Intelligence Lookup</li>
+
+<li>Risk Score Calculation for IP Addresses</li>
+
+<li>Malicious URL Scanner using VirusTotal API</li>
+
+<li>Scan History Logging with Database</li>
+
+<li>Threat Statistics Dashboard</li>
+
+<li>CSV Report Export</li>
+
+<li>Admin Panel for User Management</li>
+
+<li>Interactive Threat Visualization</li>
+
+</ul>
 
 <h2>Technologies Used</h2>
 
+<div class="tech-list">
+
+<div class="tech">Python</div>
+<div class="tech">Flask</div>
+<div class="tech">SQLite</div>
+<div class="tech">HTML</div>
+<div class="tech">CSS</div>
+<div class="tech">Chart.js</div>
+<div class="tech">REST APIs</div>
+<div class="tech">VirusTotal API</div>
+
+</div>
+
+<h2>Purpose of the Project</h2>
+
 <p>
-Frontend : HTML, CSS, JavaScript<br>
-Backend : Python Flask Framework<br>
-Database : SQLite Database<br>
-Visualization : Chart.js<br>
+The main goal of this project is to demonstrate how cybersecurity tools can be
+built to collect and analyze threat intelligence. Security analysts often rely
+on automated dashboards and intelligence platforms to detect suspicious
+network behavior. This project simulates such a system and helps understand how
+threat intelligence tools work.
 </p>
 
-<h2>Cyber Security Relevance</h2>
+<h2>Future Improvements</h2>
+
+<ul class="feature-list">
+
+<li>Real-time Threat Monitoring</li>
+
+<li>Integration with more threat intelligence APIs</li>
+
+<li>Dark Web breach monitoring</li>
+
+<li>Advanced malware detection</li>
+
+<li>Geo-location threat mapping</li>
+
+<li>AI-based threat prediction</li>
+
+</ul>
+
+<div class="dev-box">
+
+<h2>Developer</h2>
 
 <p>
-This project demonstrates how cyber security professionals use threat intelligence
-tools to analyze network activity. By evaluating IP information and geographic
-risk levels, security teams can detect suspicious behavior and prevent potential
-cyber attacks.
+Developed by <strong>Ayush Nandavade & Tejas Thorwat</strong>
 </p>
 
 <p>
-The dashboard represents a simplified model of a Security Operations Center (SOC)
-environment where analysts monitor threats and investigate suspicious IP addresses.
+This project is created as a cybersecurity learning project to explore
+threat intelligence, web security tools, and SOC monitoring concepts.
 </p>
 
 </div>
 
 </div>
 
-<footer style="
-text-align:center;
-margin-top:40px;
-padding:15px;
-font-size:14px;
-color:#888;">
-
-Made by <strong>Ayush & Tejas</strong>
-
-</footer>
+</div>
 
 </body>
 

@@ -11,9 +11,16 @@
 
 <style>
 
+body{
+background:#020617;
+color:white;
+font-family:Arial;
+margin:0;
+}
+
 .result-box{
 
-width:420px;
+width:450px;
 margin:80px auto;
 background:#1e293b;
 padding:30px;
@@ -44,6 +51,14 @@ font-weight:bold;
 font-size:26px;
 }
 
+.info{
+margin-top:10px;
+}
+
+.info p{
+margin:6px;
+}
+
 .links a{
 display:block;
 margin-top:10px;
@@ -53,6 +68,18 @@ text-decoration:none;
 
 .links a:hover{
 text-decoration:underline;
+}
+
+.activity{
+margin-top:15px;
+background:#020617;
+padding:10px;
+border-radius:8px;
+}
+
+.activity span{
+display:block;
+margin-top:5px;
 }
 
 </style>
@@ -73,6 +100,16 @@ text-decoration:underline;
 {{ country }}
 </span>
 </p>
+
+<div class="info">
+
+<p><strong>City:</strong> {{ city }}</p>
+
+<p><strong>ISP:</strong> {{ isp }}</p>
+
+<p><strong>Organization:</strong> {{ org }}</p>
+
+</div>
 
 <p><strong>Risk Score:</strong> {{ risk_score }}%</p>
 
@@ -98,15 +135,29 @@ text-decoration:underline;
 {% endif %}
 
 
+<div class="activity">
+
+<strong>Activity Indicators</strong>
+
+<span>VPN: {{ vpn }}</span>
+
+<span>Proxy: {{ proxy }}</span>
+
+<span>Tor: {{ tor }}</span>
+
+</div>
+
+
 <div style="width:280px; margin:auto; margin-top:20px;">
 <canvas id="riskChart"></canvas>
 </div>
+
 
 <div class="links">
 
 <a href="/history">View Scan History</a>
 
-<a href="/">Scan Another IP</a>
+<a href="/scanner">Scan Another IP</a>
 
 </div>
 

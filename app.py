@@ -3,6 +3,9 @@ import sqlite3
 import requests
 import datetime
 import ipaddress
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = "secret123"
@@ -39,7 +42,6 @@ def init_db():
     conn.commit()
     conn.close()
 
-
 init_db()
 
 
@@ -70,7 +72,7 @@ def home():
     if "user" in session:
         return redirect("/dashboard")
 
-    return redirect("/register")
+    return redirect("/login")
 
 
 # -------------------------------
@@ -79,9 +81,6 @@ def home():
 
 @app.route("/register", methods=["GET","POST"])
 def register():
-
-    if "user" in session:
-        return redirect("/dashboard")
 
     if request.method == "POST":
 
@@ -155,10 +154,10 @@ def dashboard():
     cursor.execute("SELECT COUNT(*) FROM scans")
     total = cursor.fetchone()[0]
 
-    cursor.execute("SELECT COUNT(*) FROM scans WHERE risk_score>50")
+    cursor.execute("SELECT COUNT(*) FROM scans WHERE risk_score > 50")
     high = cursor.fetchone()[0]
 
-    cursor.execute("SELECT COUNT(*) FROM scans WHERE risk_score<=50")
+    cursor.execute("SELECT COUNT(*) FROM scans WHERE risk_score <= 50")
     low = cursor.fetchone()[0]
 
     conn.close()
@@ -172,7 +171,7 @@ def dashboard():
 
 
 # -------------------------------
-# SCANNER
+# IP SCANNER
 # -------------------------------
 
 @app.route("/scanner", methods=["GET","POST"])
@@ -189,25 +188,33 @@ def scanner():
 
             ip_obj = ipaddress.ip_address(ip)
 
-            # Private IP detection
-            if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_reserved:
-                country = "Private / Reserved IP"
+            country = "Unknown"
+            city = "Unknown"
+            isp = "Unknown"
+            org = "Unknown"
+            vpn = "No"
+            proxy = "No"
+            tor = "No"
+
+            if ip_obj.is_private:
+                country = "Private IP"
                 risk_score = 0
 
             else:
 
                 response = requests.get(
-                    f"http://ip-api.com/json/{ip}",
-                    timeout=5
+                f"http://ip-api.com/json/{ip}"
                 )
 
                 data = response.json()
 
                 country = data.get("country","Unknown")
+                city = data.get("city","Unknown")
+                isp = data.get("isp","Unknown")
+                org = data.get("org","Unknown")
 
                 risk_score = calculate_risk(country)
 
-            # Save scan
             conn = sqlite3.connect("database.db")
             cursor = conn.cursor()
 
@@ -223,13 +230,80 @@ def scanner():
                 "result.html",
                 ip=ip,
                 country=country,
+                city=city,
+                isp=isp,
+                org=org,
+                vpn=vpn,
+                proxy=proxy,
+                tor=tor,
                 risk_score=risk_score
             )
 
         except:
-            return "Invalid IP Address"
+
+            return "Invalid IP"
 
     return render_template("index.html")
+
+
+# -------------------------------
+# MALICIOUS URL SCANNER
+# -------------------------------
+
+@app.route("/url-scan", methods=["GET","POST"])
+def url_scan():
+
+    result = None
+
+    if request.method == "POST":
+
+        url = request.form["url"]
+
+        try:
+
+            import os
+
+            api_key = os.getenv("VT_API_KEY")
+
+            headers = {
+                "x-apikey": api_key
+            }
+
+            data = {
+                "url": url
+            }
+
+            # Submit URL to VirusTotal
+            submit = requests.post(
+                "https://www.virustotal.com/api/v3/urls",
+                headers=headers,
+                data=data
+            )
+
+            analysis_id = submit.json()["data"]["id"]
+
+            # Get analysis report
+            report = requests.get(
+                f"https://www.virustotal.com/api/v3/analyses/{analysis_id}",
+                headers=headers
+            )
+
+            stats = report.json()["data"]["attributes"]["stats"]
+
+            result = {
+                "url": url,
+                "malicious": stats["malicious"],
+                "suspicious": stats["suspicious"],
+                "harmless": stats["harmless"]
+            }
+
+        except:
+
+            result = "error"
+
+        return render_template("url_result.html", result=result)
+
+    return render_template("url_scan.html")
 
 
 # -------------------------------
@@ -263,10 +337,10 @@ def statistics():
     cursor.execute("SELECT COUNT(*) FROM scans")
     total = cursor.fetchone()[0]
 
-    cursor.execute("SELECT COUNT(*) FROM scans WHERE risk_score>=70")
+    cursor.execute("SELECT COUNT(*) FROM scans WHERE risk_score >= 70")
     high = cursor.fetchone()[0]
 
-    cursor.execute("SELECT COUNT(*) FROM scans WHERE risk_score<70")
+    cursor.execute("SELECT COUNT(*) FROM scans WHERE risk_score < 70")
     low = cursor.fetchone()[0]
 
     conn.close()
@@ -327,6 +401,11 @@ def contact():
     return render_template("contact.html")
 
 
+@app.route("/map")
+def map():
+    return render_template("map.html")
+
+
 @app.route("/admin")
 def admin():
 
@@ -341,20 +420,12 @@ def admin():
     return render_template("admin.html",users=users)
 
 
-@app.route("/map")
-def map():
-    return render_template("map.html")
-
-
 # -------------------------------
 # CHANGE PASSWORD
 # -------------------------------
 
-@app.route("/change-password", methods=["GET","POST"])
+@app.route("/change-password",methods=["GET","POST"])
 def change_password():
-
-    if "user" not in session:
-        return redirect("/login")
 
     if request.method == "POST":
 
@@ -379,11 +450,11 @@ def change_password():
             )
 
             conn.commit()
-            conn.close()
 
-            return "Password Updated Successfully"
+            return "Password Updated"
 
         else:
+
             return "Old password incorrect"
 
     return render_template("change_password.html")
@@ -399,11 +470,6 @@ def logout():
     session.clear()
 
     return redirect("/login")
-
-
-@app.route("/forgot")
-def forgot():
-    return render_template("forgot.html")
 
 
 # -------------------------------

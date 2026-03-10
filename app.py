@@ -263,6 +263,9 @@ def url_scan():
 
             api_key = os.getenv("VT_API_KEY")
 
+            if not api_key:
+             return "VirusTotal API key not configured"
+
             headers = {
                 "x-apikey": api_key
             }

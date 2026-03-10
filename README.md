@@ -145,6 +145,18 @@ pip install flask requests python-dotenv
 VT_API_KEY=your_virustotal_api_key
 ```
 
+You can get a free API key from:
+
+https://www.virustotal.com/gui/join-us
+
+⚠ **Important:**  
+The `.env` file is not included in this repository for security reasons.
+
+---
+
+# ▶ Run Application
+
+
 ### 4️⃣ Run Application
 
 ```

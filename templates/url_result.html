@@ -110,20 +110,20 @@ transform:translateY(0);
 <h2>URL Scan Result</h2>
 
 <p><strong>URL:</strong></p>
-<p style="color:#38bdf8">{{ result.url }}</p>
+<p style="color:#38bdf8">{{ result["url"] }}</p>
 
 <div class="stats">
 
 <div class="stat malicious">
-🚨 Malicious Engines : {{ result.malicious }}
+🚨 Malicious Engines : {{ result["malicious"] }}
 </div>
 
 <div class="stat suspicious">
-⚠️ Suspicious Engines : {{ result.suspicious }}
+⚠️ Suspicious Engines : {{ result["suspicious"] }}
 </div>
 
 <div class="stat safe">
-✅ Safe Engines : {{ result.harmless }}
+✅ Safe Engines : {{ result["harmless"] }}
 </div>
 
 </div>

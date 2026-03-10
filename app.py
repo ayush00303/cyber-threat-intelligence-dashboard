@@ -261,8 +261,6 @@ def url_scan():
 
         try:
 
-            import os
-
             api_key = os.getenv("VT_API_KEY")
 
             headers = {
@@ -282,20 +280,48 @@ def url_scan():
 
             analysis_id = submit.json()["data"]["id"]
 
-            # Get analysis report
-            report = requests.get(
-                f"https://www.virustotal.com/api/v3/analyses/{analysis_id}",
-                headers=headers
-            )
+            import time
 
-            stats = report.json()["data"]["attributes"]["stats"]
+            stats = None
 
-            result = {
+            # Wait until analysis complete
+            for i in range(10):
+
+                report = requests.get(
+                    f"https://www.virustotal.com/api/v3/analyses/{analysis_id}",
+                    headers=headers
+                )
+
+                response_data = report.json()
+
+                status = response_data["data"]["attributes"]["status"]
+
+                if status == "completed":
+
+                    stats = response_data["data"]["attributes"]["stats"]
+                    break
+
+                time.sleep(2)
+
+            if stats:
+
+                result = {
                 "url": url,
                 "malicious": stats["malicious"],
-                "suspicious": stats["suspicious"],
-                "harmless": stats["harmless"]
-            }
+                 "suspicious": stats["suspicious"],
+              "harmless": stats["harmless"]
+                        }
+
+                print(result)
+
+            else:
+
+                result = {
+                    "url": url,
+                    "malicious": 0,
+                    "suspicious": 0,
+                    "harmless": 0
+                }
 
         except:
 
@@ -304,7 +330,6 @@ def url_scan():
         return render_template("url_result.html", result=result)
 
     return render_template("url_scan.html")
-
 
 # -------------------------------
 # HISTORY
